@@ -108,7 +108,7 @@ jobs:
     runs-on: ${{ matrix.platform.os }}
     strategy:
       matrix:
-        platform:
+        include:
           #- target: "x86_64-unknown-linux-gnu"
           #  os: "ubuntu-latest"
           #  bin: "offchain-resolver-gateway"
