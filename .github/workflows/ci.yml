@@ -132,28 +132,20 @@ jobs:
     steps:
       - name: "Check out the repo"
         uses: actions/checkout@v3
-      #- name: Cache cargo & target directories
-      #  uses: Swatinem/rust-cache@v2
-      #- name: Install toolchain if not cross-compiling
-      #  uses: dtolnay/rust-toolchain@stable
-      #  with:
-      #    targets: ${{ matrix.platform.target }}
-      #  if: ${{ !matrix.platform.cross }}
-      #- name: Install musl-tools on Linux
-      #  run: sudo apt-get update --yes && sudo apt-get install --yes musl-tools
-      #  #run: sudo apt-get install --yes musl-tools
-      #  if: contains(matrix.platform.target, 'musl')
-      #- name: Build binary
-      #  uses: houseabsolute/actions-rust-cross@v0
-      #  with:
-      #    command: "build"
-      #    target: ${{ matrix.platform.target }}
-      #    args: "--locked --release"
-      #    strip: true
-      - name: Build Linux
-        if: matrix.platform.os == 'ubuntu-latest'
+      
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          target: ${{ matrix.target }}
+
+      - name: Install cross
+        if: matrix.cross
+        uses: taiki-e/install-action@cross
+
+      - name: Enable cross-compilation
+        if: matrix.cross
+        shell: bash
         run: |
-          docker run --rm -t \
-            -v "$(pwd)":/volume \
-            clux/muslrust:stable \
-            cargo build --release --bin offchain-resolver-gateway --target ${{ matrix.platform.target }}
+          echo "CARGO=cross" >> $GITHUB_ENV
+      - name: Build
+        run: ${{ env.CARGO }} build --release --locked --target ${{ matrix.target }}
+
