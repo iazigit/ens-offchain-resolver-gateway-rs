@@ -138,7 +138,6 @@ jobs:
           target: ${{ matrix.target }}
 
       - name: Install cross
-        if: matrix.cross
         uses: taiki-e/install-action@cross
 
     # - name: Enable cross-compilation
