@@ -141,11 +141,12 @@ jobs:
         if: matrix.cross
         uses: taiki-e/install-action@cross
 
-      - name: Enable cross-compilation
-        if: matrix.cross
-        shell: bash
-        run: |
-          echo "CARGO=cross" >> $GITHUB_ENV
+    # - name: Enable cross-compilation
+    #    if: matrix.cross
+    #    shell: bash
+    #    run: |
+    #      echo "CARGO=cross" >> $GITHUB_ENV
+
       - name: Build
-        run: ${{ env.CARGO }} build --release --locked --target ${{ matrix.target }}
+        run: cross build --release --bin offchain-resolver-gateway --locked --target ${{ matrix.target }}
 
