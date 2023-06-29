@@ -104,11 +104,11 @@ jobs:
           args: "-- -D warnings"
   
   cross-compile:
-    name: ${{ matrix.platform.target }}
-    runs-on: ${{ matrix.platform.os }}
+    name: ${{ matrix.target }}
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        platform:
+        include:
           #- target: "x86_64-unknown-linux-gnu"
           #  os: "ubuntu-latest"
           #  bin: "offchain-resolver-gateway"
@@ -116,9 +116,7 @@ jobs:
           #  cargo_command: cargo
           - target: "x86_64-unknown-linux-musl"
             os: "ubuntu-latest"
-            bin: "offchain-resolver-gateway"
             cross: true
-            cargo_command: cargo
           #- target: x86_64-apple-darwin
           #  os: macOS-11
           #  macosx_deployment_target: 10.13
@@ -132,28 +130,20 @@ jobs:
     steps:
       - name: "Check out the repo"
         uses: actions/checkout@v3
-      #- name: Cache cargo & target directories
-      #  uses: Swatinem/rust-cache@v2
-      #- name: Install toolchain if not cross-compiling
-      #  uses: dtolnay/rust-toolchain@stable
-      #  with:
-      #    targets: ${{ matrix.platform.target }}
-      #  if: ${{ !matrix.platform.cross }}
-      #- name: Install musl-tools on Linux
-      #  run: sudo apt-get update --yes && sudo apt-get install --yes musl-tools
-      #  #run: sudo apt-get install --yes musl-tools
-      #  if: contains(matrix.platform.target, 'musl')
-      #- name: Build binary
-      #  uses: houseabsolute/actions-rust-cross@v0
-      #  with:
-      #    command: "build"
-      #    target: ${{ matrix.platform.target }}
-      #    args: "--locked --release"
-      #    strip: true
-      - name: Build Linux
-        if: matrix.platform.os == 'ubuntu-latest'
-        run: |
-          docker run --rm -t \
-            -v "$(pwd)":/volume \
-            clux/muslrust:stable \
-            cargo build --release --bin offchain-resolver-gateway --target ${{ matrix.platform.target }}
+      
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          target: ${{ matrix.target }}
+
+      - name: Install cross
+        uses: taiki-e/install-action@cross
+
+    # - name: Enable cross-compilation
+    #    if: matrix.cross
+    #    shell: bash
+    #    run: |
+    #      echo "CARGO=cross" >> $GITHUB_ENV
+
+      - name: Build
+        run: cross build --release --bin offchain-resolver-gateway --locked --target ${{ matrix.target }}
+
