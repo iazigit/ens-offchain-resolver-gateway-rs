@@ -104,8 +104,8 @@ jobs:
           args: "-- -D warnings"
   
   cross-compile:
-    name: ${{ matrix.platform.target }}
-    runs-on: ${{ matrix.platform.os }}
+    name: ${{ matrix.target }}
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         include:
@@ -116,9 +116,7 @@ jobs:
           #  cargo_command: cargo
           - target: "x86_64-unknown-linux-musl"
             os: "ubuntu-latest"
-            bin: "offchain-resolver-gateway"
             cross: true
-            cargo_command: cargo
           #- target: x86_64-apple-darwin
           #  os: macOS-11
           #  macosx_deployment_target: 10.13
